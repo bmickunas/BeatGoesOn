@@ -5,7 +5,7 @@ import time
 
 def get_song_results(s_params, hundreds=10):
     if 'api_key' not in s_params:
-        s_params['api_key'] = 'VSCPXIV4KTWEQ7NFF'
+        s_params['api_key'] = 'ZSDNTL7YAQRK6028S'
     s_params['bucket'] = ['audio_summary', 'id:spotify-WW', 'tracks']
     s_params['limit'] = 'true'
     s_params['results'] = '100'
