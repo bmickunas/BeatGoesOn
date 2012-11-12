@@ -23,14 +23,14 @@ def get_song_results(s_params, hundreds=10):
             print 'Search error!'
             print results['response']['status']
         results_count = len(results['response']['songs'])
-        print "number of results:", results_count
+        #print "number of results:", results_count
         for j in range(results_count):
-            print j
+           # print j
             song = results['response']['songs'][j]
             detail_url = song['audio_summary']['analysis_url']
-            print detail_url
+           # print detail_url
             analysis = requests.get(detail_url)
-            print analysis.status_code
+           # print analysis.status_code
             song['analysis'] = analysis.json
             song['search_rank'] = i*100 + j
             my_results.append(song)
@@ -38,7 +38,6 @@ def get_song_results(s_params, hundreds=10):
             break
 
     return my_results
-
 
 if __name__ == "__main__":
     params = {"sort": "song_hotttnesss-desc"}
@@ -51,14 +50,12 @@ if __name__ == "__main__":
 
     start_time = time.time()
     print "Starting data write..."
-    data_file = open("top_100_songs.json", 'w')
-    json.dump(results, data_file) # print pretty json objects with the indent=4 parameter
+    analysis_keys = ["tempo", "key", "loudness"]
+    filename = "top_100_songs_toexcel.txt" 
+    data_file = open(filename,'w')
+    for result in results:
+        #print format: title    tempo   key    loudness
+        data_file.write(result['title']+"\t"+str(result['analysis']['track']['tempo'])+"\t"+
+            str(result['analysis']['track']['key'])+"\t"+str(result['analysis']['track']['loudness'])+"\n")
     end_time = time.time()
     print 'Wrote data after %.3f seconds'%(end_time - start_time)
-    
-            
-            
-            
-
-    
-                         
