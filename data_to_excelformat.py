@@ -9,7 +9,7 @@ def get_song_results(s_params, hundreds=10):
         s_params['api_key'] = 'ZSDNTL7YAQRK6028S'
     s_params['bucket'] = ['audio_summary', 'id:spotify-WW', 'tracks']
     s_params['limit'] = 'true'
-    s_params['results'] = '10'
+    s_params['results'] = '100'
 
     search_url = 'http://developer.echonest.com/api/v4/song/search'
 
@@ -26,6 +26,8 @@ def get_song_results(s_params, hundreds=10):
         #print "number of results:", results_count
         for j in range(results_count):
            # print j
+            if (j%5) == 0: 
+                print j
             song = results['response']['songs'][j]
             detail_url = song['audio_summary']['analysis_url']
            # print detail_url
@@ -46,6 +48,7 @@ if __name__ == "__main__":
     print "Starting getting results..."
     results = get_song_results(params, 1)
     end_time = time.time()
+    num_results = len(results)
     print 'Got results after %.3f seconds'%(end_time - start_time)
 
     start_time = time.time()
@@ -53,9 +56,34 @@ if __name__ == "__main__":
     analysis_keys = ["tempo", "key", "loudness"]
     filename = "top_100_songs_toexcel.txt" 
     data_file = open(filename,'w')
-    for result in results:
+    for i in range(num_results):
         #print format: title    tempo   key    loudness
-        data_file.write(result['title']+"\t"+str(result['analysis']['track']['tempo'])+"\t"+
-            str(result['analysis']['track']['key'])+"\t"+str(result['analysis']['track']['loudness'])+"\n")
+        #song_info = str(result['title'])+"\t"+str(result['analysis']['track']['tempo'])+"\t"+str(result['analysis']['track']['key'])+"\t"+str(result['analysis']['track']['loudness'])+"\n" 
+        try:
+            json.dump(results[i]['title'],data_file)
+            data_file.write("\t")
+        except:
+            data_file.write("NONE\n")
+        try:    
+            json.dump(results[i]['analysis']['track']['tempo'],data_file)
+            data_file.write("\t")
+        except:
+            data_file.write("NONE\t")
+        try:
+            json.dump(results[i]['analysis']['track']['key'],data_file)
+            data_file.write("\t")
+        except:
+            data_file.write("NONE\t")
+        try:    
+            json.dump(results[i]['analysis']['track']['loudness'],data_file)
+        except:
+            print "dump error"
+            data_file.write("NONE\t")
+        try:
+            data_file.write("\n")
+        except:
+            print "write error"
+            data_file.write("NONE\n")
+            
     end_time = time.time()
     print 'Wrote data after %.3f seconds'%(end_time - start_time)
