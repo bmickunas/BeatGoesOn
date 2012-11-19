@@ -28,14 +28,27 @@ class BeatGoesOn(object):
         return {dim:weight/mag for dim,score in vect.iteritems()}
         pass
     
-    def searchommend(self, song):
+    def searchommend(self, seed):
         # calculate similarity value between song and all songs 
         #   in song_space
-        
-        # store each sim value inside corresponding song object 
-        #   in 'sim'
+        most_sim_song = ['0',0.0]
+        for song in self.song_space:
+            song['sim'] = sum(
+                    seed['vect'][k]*song['vect'][k]
+                    for dim in dim_small_set
+                    )
+            if song['sim'] > most_sim_song[1]:                
+                most_sim_song[0] = song['spotify_id']
+                most_sim_song[1] = song['sim']
+        return most_sim_song[0]
+        # How do we want to choose which song is best?
         pass
     def generate_playlist(self, play_count, initial_song):
-        # searchomement play_count songs 
-        # return list of songs
+        # searchommend play_count number of songs
+        result_spot_id = searchommend(initial_song)
+        playlist.append(result_spot_id)
+        for i in range(play_count):
+            result_spot_id = searchommend(result_spot_id)
+            playlist.append(result_spot_id)
+        return playlist
         pass 
