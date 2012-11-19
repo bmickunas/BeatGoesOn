@@ -1,4 +1,4 @@
 BeatGoesOn
 ==========
 
-not much of anything right now...
+A blend between a search engine and a reccommender system... a searchommender... that produces a continuous song playlist
