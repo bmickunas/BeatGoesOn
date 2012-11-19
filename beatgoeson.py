@@ -47,8 +47,9 @@ class BeatGoesOn(object):
     def generate_playlist(self, play_count, initial_song):
         # searchommend play_count number of songs
         result_spot_id = searchommend(initial_song)
+        playlist.append(initial_song)
         playlist.append(result_spot_id)
-        for i in range(play_count):
+        for i in range(play_count-2):
             result_spot_id = searchommend(result_spot_id)
             playlist.append(result_spot_id)
         return playlist
