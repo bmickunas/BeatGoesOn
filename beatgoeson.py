@@ -1,7 +1,7 @@
 dim_full_set = ['danceability','duration','energy','key','loudness',
                     'tempo', 'speechiness', 'liveness', 'mode',
                         'time_signature']
-dim_small_set = ['danceability','energy','key'
+dim_small_set = ['danceability','energy','key']
                             
 class BeatGoesOn(object):
     """ 
@@ -31,6 +31,7 @@ class BeatGoesOn(object):
     def searchommend(self, song):
         # calculate similarity value between song and all songs 
         #   in song_space
+        
         # store each sim value inside corresponding song object 
         #   in 'sim'
         pass
