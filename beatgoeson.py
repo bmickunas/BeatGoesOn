@@ -13,8 +13,9 @@ class BeatGoesOn(object):
         self.song_space = {} # vector space of all songs to choose from
         
     def vectorize(self, songs):
-        # make sure all values are normalized
+        # songs is the list of nice data structures with the info we need
         for song in songs:
+            # get the normalized vector of for the song characteristics
             song['vect'] = self.normed_vect(song)
             # store song in song_space
             self.song_space.append(song);
@@ -22,7 +23,7 @@ class BeatGoesOn(object):
         # Create the vector that has the dimensions with scores
         vect = {dim:song[dim] for dim in dim_small_set}
           # calculate the magnitude of the vector
-        # What about the values that are already normalized
+        # What about the values that are already normalized?
         for dim in dim_small_set:
             mag = math.sqrt(sum(song[dim]**2))
         return {dim:weight/mag for dim,score in vect.iteritems()}
@@ -34,7 +35,7 @@ class BeatGoesOn(object):
         most_sim_song = ['0',0.0]
         for song in self.song_space:
             song['sim'] = sum(
-                    seed['vect'][k]*song['vect'][k]
+                    seed['vect'][dim]*song['vect'][dim]
                     for dim in dim_small_set
                     )
             if song['sim'] > most_sim_song[1]:                
