@@ -9,7 +9,7 @@ def get_song_results(s_params, hundreds=10):
         s_params['api_key'] = 'ZSDNTL7YAQRK6028S'
     s_params['bucket'] = ['audio_summary', 'id:spotify-WW', 'tracks']
     s_params['limit'] = 'true'
-    s_params['results'] = '100'
+    s_params['results'] = '10'
 
     search_url = 'http://developer.echonest.com/api/v4/song/search'
 
@@ -62,28 +62,13 @@ if __name__ == "__main__":
         try:
             json.dump(results[i]['title'],data_file)
             data_file.write("\t")
-        except:
-            data_file.write("NONE\n")
-        try:    
             json.dump(results[i]['analysis']['track']['tempo'],data_file)
             data_file.write("\t")
-        except:
-            data_file.write("NONE\t")
-        try:
             json.dump(results[i]['analysis']['track']['key'],data_file)
             data_file.write("\t")
-        except:
-            data_file.write("NONE\t")
-        try:    
             json.dump(results[i]['analysis']['track']['loudness'],data_file)
         except:
-            print "dump error"
-            data_file.write("NONE\t")
-        try:
-            data_file.write("\n")
-        except:
-            print "write error"
-            data_file.write("NONE\n")
-            
+            data_file.write("NONE")
+        data_file.write("\n")
     end_time = time.time()
     print 'Wrote data after %.3f seconds'%(end_time - start_time)
