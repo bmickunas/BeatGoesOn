@@ -26,10 +26,9 @@ class BeatGoesOn(object):
         # What about the values that are already normalized?
         for dim in dim_small_set:
             mag = math.sqrt(sum(song[dim]**2))
-        return {dim:weight/mag for dim,score in vect.iteritems()}
-        pass
+        return {dim:weight/mag for dim,score in vect.iteritems()}        
     
-    def searchommend(self, seed):
+    def searchommend(self, seed, playlist):
         # calculate similarity value between song and all songs 
         #   in song_space
         most_sim_song = ['0',0.0]
@@ -38,12 +37,12 @@ class BeatGoesOn(object):
                     seed['vect'][dim]*song['vect'][dim]
                     for dim in dim_small_set
                     )
-            if song['sim'] > most_sim_song[1]:                
+            # if the song is more similar and it is not already in the playlist
+            if ((song['sim'] > most_sim_song[1])&&(!song.index(song))):                
                 most_sim_song[0] = song['spotify_id']
                 most_sim_song[1] = song['sim']
-        return most_sim_song[0]
-        # How do we want to choose which song is best?
-        pass
+        return most_sim_song[0]        
+        
     def generate_playlist(self, play_count, initial_song):
         # searchommend play_count number of songs
         result_spot_id = searchommend(initial_song)
@@ -52,5 +51,4 @@ class BeatGoesOn(object):
         for i in range(play_count-2):
             result_spot_id = searchommend(result_spot_id)
             playlist.append(result_spot_id)
-        return playlist
-        pass 
+        return playlist        
