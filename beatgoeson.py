@@ -18,7 +18,8 @@ class BeatGoesOn(object):
             # get the normalized vector of for the song characteristics
             song['vect'] = self.normed_vect(song)
             # store song in song_space
-            self.song_space.append(song);
+            self.song_space.append(song)
+            
     def normed_vect(self, song):
         # Create the vector that has the dimensions with scores
         vect = {dim:song[dim] for dim in dim_small_set}
