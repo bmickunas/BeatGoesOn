@@ -3,13 +3,13 @@ import requests
 import ujson as json
 import time
 import json
-
+import utils
 def get_song_results(s_params, hundreds=10):
     if 'api_key' not in s_params:
         s_params['api_key'] = 'ZSDNTL7YAQRK6028S'
     s_params['bucket'] = ['audio_summary', 'id:spotify-WW', 'tracks']
     s_params['limit'] = 'true'
-    s_params['results'] = '10'
+    s_params['results'] = '1'
 
     search_url = 'http://developer.echonest.com/api/v4/song/search'
 
@@ -49,10 +49,12 @@ if __name__ == "__main__":
     end_time = time.time()
     print 'Got results after %.3f seconds'%(end_time - start_time)
 
+    nice_data = utils.prune_songs(results)
+    
     start_time = time.time()
     print "Starting data write..."
     data_file = open("top_100_songs.json", 'w')
-    json.dump(results, data_file) # print pretty json objects with the indent=4 parameter
+    json.dump(results, data_file, indent=4) # print pretty json objects with the indent=4 parameter
     end_time = time.time()
     print 'Wrote data after %.3f seconds'%(end_time - start_time)
     
