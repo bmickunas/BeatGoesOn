@@ -10,8 +10,7 @@ class BeatGoesOn(object):
     """
     
     def __init__(self):
-        self.song_space = {} # vector space of all songs to choose from
-        
+        self.song_space = {} # vector space of all songs to choose from        
     def vectorize(self, songs):
         # songs is the list of nice data structures with the info we need
         for song in songs:

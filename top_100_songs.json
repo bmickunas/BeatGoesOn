@@ -1,0 +1,22 @@
+[
+    {
+        "title": "Diamonds", 
+        "artist_name": "Rihanna", 
+        "artist_id": "ARKU3Z61187FB51DCA", 
+        "analysis": {}, 
+        "id": "SOJQIGQ13A948749E2", 
+        "audio_summary": {
+            "time_signature": 4, 
+            "analysis_url": "http://echonest-analysis.s3.amazonaws.com/TR/Q4mnWgvv6VaU0Y8M8D9BD5OqKxUP87uklRYWDGJw2wB7hyIBYnrGALLCKA-07WcUg4L_Af/3/full.json?AWSAccessKeyId=AKIAJRDFEY23UEVW42BQ&Expires=1353427611&Signature=oE/tVeGGidANEBGmriaTIHBZUWo%3D", 
+            "energy": 0.42769374303437746, 
+            "liveness": 0.12758514218657416, 
+            "tempo": 91.996, 
+            "speechiness": 0.04461584709276234, 
+            "mode": 0, 
+            "key": 11, 
+            "duration": 225.2273, 
+            "loudness": -6.738, 
+            "danceability": 0.5472644951220051
+        }
+    }
+]
