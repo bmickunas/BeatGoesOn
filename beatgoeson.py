@@ -38,13 +38,14 @@ class BeatGoesOn(object):
                     for dim in dim_small_set
                     )
             # if the song is more similar and it is not already in the playlist
-            if ((song['sim'] > most_sim_song[1])&&(!song.index(song))):                
+            if ((song['sim'] > most_sim_song[1]) and (playlist.count(song)==0))):                
                 most_sim_song[0] = song['spotify_id']
                 most_sim_song[1] = song['sim']
         return most_sim_song[0]        
         
     def generate_playlist(self, play_count, initial_song):
         # searchommend play_count number of songs
+        playlist = []
         result_spot_id = searchommend(initial_song)
         playlist.append(initial_song)
         playlist.append(result_spot_id)
