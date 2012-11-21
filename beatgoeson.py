@@ -3,7 +3,15 @@ dim_full_set = ['danceability','duration','energy','key','loudness',
                     'tempo', 'speechiness', 'liveness', 'mode',
                         'time_signature']
 dim_small_set = ['danceability','energy','liveness']
-                            
+
+norm_ref = {
+    'key': {'max': 11, 'min': -1},
+    'loudness': {'max': 100.0, 'min': -100.0},
+    'tempo': {'max': 500.0, 'min': 0.0},
+    'mode': {'max': 1, 'min': -1},
+    'time_signature': {'max': 7, 'min': -1}
+    }
+  
 class BeatGoesOn(object):
     """ 
     A searchommender (search/reccommender) for continuous playlist 
@@ -11,7 +19,8 @@ class BeatGoesOn(object):
     """
     
     def __init__(self):
-        self.song_space = [] # vector space of all songs to choose from        
+        self.song_space = [] # vector space of all songs to choose from   
+        
     def vectorize(self, songs):
         # songs is the list of nice data structures with the info we need
         for song in songs:
@@ -22,11 +31,15 @@ class BeatGoesOn(object):
             
     def normed_vect(self, song):
         # Create the vector that has the dimensions with scores
-        vect = {dim:song[dim] for dim in dim_small_set}
-          # calculate the magnitude of the vector
+        vect = {dim:song[dim] for dim in dim_small_set} # or full_set
+        # calculate the magnitude of the vector
         # What about the values that are already normalized?
-        mag = math.sqrt(sum(song[dim]**2 for dim in dim_small_set))
-        return {dim:score/mag for dim,score in vect.iteritems()}        
+        for dim in dim_small_set:                       #or full_set
+            if dim in norm_ref:
+                normed_score = ((vect[dim] - norm_ref[dim]['min'])
+                                / (norm_ref[dim]['max'] - norm_ref[dim]['min']))
+                vect[dim] = normed_score
+        return vect       
     
     def searchommend(self, seed, playlist):
         # calculate similarity value between song and all songs 
