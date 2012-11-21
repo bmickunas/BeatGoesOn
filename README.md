@@ -1,4 +1,5 @@
 BeatGoesOn
+Created by Sam Hatfield and Bradley Mickunas
 ==========
 Run the Code with the real data:
 1) Enter into the command window:
