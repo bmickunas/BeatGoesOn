@@ -44,28 +44,23 @@ class BeatGoesOn(object):
     def searchommend(self, seed, playlist):
         # calculate similarity value between song and all songs 
         #   in song_space
-        most_sim_song = ['',0.0]
-        print 'Searching for', seed['title'], '...'
-        mag_seed = math.sqrt(sum(seed['vect'][dim]**2 for dim in dim_small_set))
-        print seed['title'], 'mag is:', mag_seed
-        for song in self.song_space:
-            print '\tComparing to:', song['title'], '...'
-            mag_song = math.sqrt(sum(song['vect'][dim]**2
-                                    for dim in dim_small_set))
-            print '\t', song['title'], 'mag is:', mag_song
-            dot_product = sum(
-                    (seed['vect'][dim]*song['vect'][dim] for dim in dim_small_set)
-                    )
-            print '\t', song['title'], 'dot_prod is:', dot_product
-            song['sim'] = dot_product/(mag_seed*mag_song)
-            print '\tSim of', song['title'], ':', song['sim']
-            # if the song is more similar and it is not already in the playlist
-            print '\tCount of song in playlist:', playlist.count(song)
-            if ((song['sim'] > most_sim_song[1]) and (playlist.count(song)==0)):                
-                most_sim_song[0] = song
-                most_sim_song[1] = song['sim']
-        print 'Returning', most_sim_song[0]['title'], 'for seed', seed['title']
-        return most_sim_song[0]        
+        #print "Length of playlist: ", len(playlist)
+        most_similar = []
+        for song in self.song_space:            
+            eucl_dist = math.sqrt(sum(
+                    ((seed['vect'][dim]-song['vect'][dim])**2 for dim in dim_small_set)
+                    ))              
+            # if the song has a lesser euclidian distance 
+            #   and it is not already in the playlist
+            if (len(most_similar) == 0): 
+                if (playlist.count(song)==0):
+                    most_similar.append(song)
+                    most_similar.append(eucl_dist)
+            else:
+                if ((eucl_dist < most_similar[1]) and (playlist.count(song)==0)):
+                        most_similar[0] = song
+                        most_similar[1] = eucl_dist 
+        return most_similar[0]        
         
     def generate_playlist(self, play_count, initial_song):
         # searchommend play_count number of songs
@@ -77,3 +72,14 @@ class BeatGoesOn(object):
             result = self.searchommend(result, playlist)
             playlist.append(result)
         return playlist        
+"""
+if __name__ == '__main__':
+    beatbox = BeatGoesOn()
+    beatbox.vectorize(data)
+    print "Enter the title of your first song"
+    title = raw_input('--> ')
+    if 
+    print "Enter how many songs you want on the playlist"
+    song_num = raw_input('--> ')
+    return beatbox.generate_playlist(song_num,song)
+    """

@@ -122,13 +122,14 @@ class TestVectorize(unittest.TestCase):
         playlist.append(mock_data[2])
         result2 = self.beatbox.searchommend(mock_data[2], playlist)
         # this time we shouldn't return the input song
-        self.assertNotEqual(result, mock_data[2])
+        self.assertNotEqual(result2, mock_data[2])
         # the closest song should be "Low" in mock_data
-        self.assertEqual(result, mock_data[1])
+        self.assertEqual(result2, mock_data[1])
 
     def test_generate_playlist(self):
-        print 'Testing playlist...'
+        #print 'Testing playlist generation...'
         playlist = self.beatbox.generate_playlist(5, mock_data[2])
+        #print playlist
         # make sure the returned playlist has the requested length
         self.assertEqual(len(playlist), 5)
         # this loop could be optimized... but it's short
@@ -138,6 +139,7 @@ class TestVectorize(unittest.TestCase):
                     continue
                 else:
                     # make sure there are no duplicates
+                   #print "i=", i, "\tj=", j
                     self.assertNotEqual(playlist[i], playlist[j])
         
         # now check if the playlist has the correct order
