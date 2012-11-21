@@ -3,10 +3,16 @@ import requests
 import ujson as json
 import time
 import json
+from settings import settings
+
+'''
+This file is a one-time-use clone of data_download.py that we used to
+create easy-to-parse data for the data checkpoint.
+'''
 
 def get_song_results(s_params, hundreds=10):
     if 'api_key' not in s_params:
-        s_params['api_key'] = 'ZSDNTL7YAQRK6028S'
+        s_params['api_key'] = settings['api_key']
     s_params['bucket'] = ['audio_summary', 'id:spotify-WW', 'tracks']
     s_params['limit'] = 'true'
     s_params['results'] = '10'
