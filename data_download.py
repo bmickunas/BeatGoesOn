@@ -5,6 +5,19 @@ import time
 import json
 import utils
 
+def rate_limit_wait(headers, thresh = 30, wait_time = 2):
+    '''
+    A function to make our program wait so that we don't hit the rate limit.
+    Parameters:
+        header - the dict headers object returned as part of requests.get
+        thresh - the threshold at which we start waiting
+        wait_time - the amount of time to wait, in seconds
+    '''
+    if int(headers['X-RateLimit-Remaining']) <= thresh:
+        print 'Near rate limit, waiting for', wait_time, 'seconds.'
+        time.sleep(wait_time)
+    
+
 def get_song_results(s_params, hundreds=10):
     if 'api_key' not in s_params:
         s_params['api_key'] = 'ZSDNTL7YAQRK6028S'
@@ -15,16 +28,21 @@ def get_song_results(s_params, hundreds=10):
     search_url = 'http://developer.echonest.com/api/v4/song/search'
 
     my_results = []
+    prev_headers = {'X-RateLimit-Remaining': '120'}
 
     for i in range(0, hundreds):
+        print 'Downloading', i, 'th hundred songs...'
         s_params['start'] = i*100
+        rate_limit_wait(prev_headers)
         raw_results = requests.get(search_url, params=s_params)
         results = raw_results.json
+        prev_headers = raw_results.headers
         if results['response']['status']['code'] != 0:
             print 'Search error!'
             print results['response']['status']
+            break
         results_count = len(results['response']['songs'])
-        print "number of results:", results_count
+        #print "number of results:", results_count
         for j in range(results_count):
             #print j
             song = results['response']['songs'][j]
@@ -59,10 +77,4 @@ if __name__ == "__main__":
     # print pretty json objects with the indent=4 parameter
     end_time = time.time()
     print 'Wrote data after %.3f seconds'%(end_time - start_time)
-    
-            
-            
-            
-
-    
-                         
+                        
