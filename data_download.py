@@ -17,7 +17,6 @@ def rate_limit_wait(headers, thresh = 30, wait_time = 2):
     if int(headers['X-RateLimit-Remaining']) <= thresh:
         print 'Near rate limit, waiting for', wait_time, 'seconds.'
         time.sleep(wait_time)
-    
 
 def get_song_results(s_params, hundreds=10):
     '''
@@ -40,6 +39,7 @@ def get_song_results(s_params, hundreds=10):
     search_url = 'http://developer.echonest.com/api/v4/song/search'
 
     my_results = []
+    
     # initialized for the use of rate_limit_wait()
     prev_headers = {'X-RateLimit-Remaining': '120'}
 
@@ -50,6 +50,7 @@ def get_song_results(s_params, hundreds=10):
         raw_results = requests.get(search_url, params=s_params)
         results = raw_results.json
         prev_headers = raw_results.headers
+
         # check to make sure our search worked correctly
         if results['response']['status']['code'] != 0:
             print 'Search error!'
@@ -64,9 +65,9 @@ def get_song_results(s_params, hundreds=10):
             #   need it yet. This speeds up download speeds significantly.
             '''
             detail_url = song['audio_summary']['analysis_url']
-            print detail_url
+            #print detail_url
             analysis = requests.get(detail_url)
-            print analysis.status_code
+            #print analysis.status_code
             song['analysis'] = analysis.json
             song['search_rank'] = i*100 + j
             '''
