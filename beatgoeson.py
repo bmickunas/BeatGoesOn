@@ -89,7 +89,7 @@ if __name__ == '__main__':
         title = raw_input('--> ')
         seed = {}
         for song in beatbox.song_space:
-            if song['title'] == title:
+            if song['title'].lower() == title.lower():
                 seed = song
                 break
         if len(seed.keys()) == 0:
@@ -106,5 +106,5 @@ if __name__ == '__main__':
                 i = i + 1 
             print "Retry? y/n"
             response = raw_input('--> ')
-            if response[0] == 'n':
+            if response[0].lower == 'n':
                 break
