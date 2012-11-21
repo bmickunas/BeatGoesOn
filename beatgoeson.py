@@ -1,15 +1,18 @@
 import math
-dim_full_set = ['danceability','duration','energy','key','loudness',
+import utils
+import ujson as json
+
+dim_full_set = ['danceability','energy','key','loudness',
                     'tempo', 'speechiness', 'liveness', 'mode',
                         'time_signature']
 dim_small_set = ['danceability','energy','liveness']
 
 norm_ref = {
-    'key': {'max': 11, 'min': -1},
+    'key': {'max': 11.0, 'min': -1.0},
     'loudness': {'max': 100.0, 'min': -100.0},
     'tempo': {'max': 500.0, 'min': 0.0},
-    'mode': {'max': 1, 'min': -1},
-    'time_signature': {'max': 7, 'min': -1}
+    'mode': {'max': 1.0, 'min': -1.0},
+    'time_signature': {'max': 7.0, 'min': -1.0}
     }
   
 class BeatGoesOn(object):
@@ -31,12 +34,12 @@ class BeatGoesOn(object):
             
     def normed_vect(self, song):
         # Create the vector that has the dimensions with scores
-        vect = {dim:song[dim] for dim in dim_small_set} # or full_set
+        vect = {dim:song[dim] for dim in dim_full_set} # or full_set
         # calculate the magnitude of the vector
         # What about the values that are already normalized?
-        for dim in dim_small_set:                       #or full_set
+        for dim in dim_full_set:                       #or full_set
             if dim in norm_ref:
-                normed_score = ((vect[dim] - norm_ref[dim]['min'])
+                normed_score = ((float(vect[dim]) - norm_ref[dim]['min'])
                                 / (norm_ref[dim]['max'] - norm_ref[dim]['min']))
                 vect[dim] = normed_score
         return vect       
@@ -72,14 +75,36 @@ class BeatGoesOn(object):
             result = self.searchommend(result, playlist)
             playlist.append(result)
         return playlist        
-"""
+        
 if __name__ == '__main__':
     beatbox = BeatGoesOn()
+    print "Reading Data..."
+    #data = utils.read_songs()
+    data_file = open("top_1000_clean_songs.json", 'r')
+    data = json.load(data_file)
     beatbox.vectorize(data)
-    print "Enter the title of your first song"
-    title = raw_input('--> ')
-    if 
-    print "Enter how many songs you want on the playlist"
-    song_num = raw_input('--> ')
-    return beatbox.generate_playlist(song_num,song)
-    """
+    print "Initializing Data..."
+    while(1):
+        print "Enter the title of your first song"
+        title = raw_input('--> ')
+        seed = {}
+        for song in beatbox.song_space:
+            if song['title'] == title:
+                seed = song
+                break
+        if len(seed.keys()) == 0:
+            print "Error: Song not found"
+            continue    
+        else:
+            print "Enter how many songs you want on the playlist"
+            song_num = raw_input('--> ')
+            groovy_playlist = beatbox.generate_playlist(int(song_num),seed)  
+            i = 1;
+            print "Results:"
+            for song in groovy_playlist:
+                print i,".) ", song['title'], " by ", song['artist_name']
+                i = i + 1 
+            print "Retry? y/n"
+            response = raw_input('--> ')
+            if response[0] == 'n':
+                break

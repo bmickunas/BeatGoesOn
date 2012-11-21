@@ -3,7 +3,7 @@ import beatgoeson
 
 
 expected_keys_small = ['danceability','energy','liveness']
-expected_keys_large = ['danceability','duration','energy','key','loudness',
+expected_keys_large = ['danceability','energy','key','loudness',
                     'tempo', 'speechiness', 'liveness', 'mode',
                         'time_signature']
 expected_norms = {
@@ -23,14 +23,14 @@ mock_data = [
         'title': 'Lower',
         'artist_name': 'Downer',
         'energy': 0.3,
-        'tempo': 150,
+        'tempo': 150.0,
         'speechiness': 0.3,
-        'key': 3,
-        'duration': 60,
+        'key': 3.0,
+        'duration': 60.0,
         'liveness': 0.3,
-        'mode': 1,
-        'time_signature': 3,
-        'loudness': -40,
+        'mode': 1.0,
+        'time_signature': 3.0,
+        'loudness': -40.0,
         'danceability': 0.3
     },
     {
@@ -51,10 +51,10 @@ mock_data = [
         'title': 'Middle',
         'artist_name': 'Man',
         'energy': 0.5,
-        'tempo': 250,
+        'tempo': 250.0,
         'speechiness': 0.5,
-        'key': 5,
-        'duration': 60,
+        'key': 5.0,
+        'duration': 60.0,
         'liveness': 0.5,
         'mode': 1,
         'time_signature': 3,
@@ -106,7 +106,7 @@ class TestVectorize(unittest.TestCase):
         self.assertEqual(len(self.beatbox.song_space), len(mock_data))
         # make sure that the song space has the expected features
         self.assertEqual(set(self.beatbox.song_space[0]['vect'].keys()), 
-                        set(expected_keys_small))
+                        set(expected_keys_large))
 
     def test_normed_vect(self):
         vector = self.beatbox.normed_vect(mock_data[2])
