@@ -127,6 +127,7 @@ class TestVectorize(unittest.TestCase):
         self.assertEqual(result, mock_data[1])
 
     def test_generate_playlist(self):
+        print 'Testing playlist...'
         playlist = self.beatbox.generate_playlist(5, mock_data[2])
         # make sure the returned playlist has the requested length
         self.assertEqual(len(playlist), 5)

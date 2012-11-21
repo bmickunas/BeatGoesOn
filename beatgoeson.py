@@ -45,24 +45,35 @@ class BeatGoesOn(object):
         # calculate similarity value between song and all songs 
         #   in song_space
         most_sim_song = ['',0.0]
+        print 'Searching for', seed['title'], '...'
+        mag_seed = math.sqrt(sum(seed['vect'][dim]**2 for dim in dim_small_set))
+        print seed['title'], 'mag is:', mag_seed
         for song in self.song_space:
-            song['sim'] = sum(
-                    seed['vect'][dim]*song['vect'][dim]
-                    for dim in dim_small_set
+            print '\tComparing to:', song['title'], '...'
+            mag_song = math.sqrt(sum(song['vect'][dim]**2
+                                    for dim in dim_small_set))
+            print '\t', song['title'], 'mag is:', mag_song
+            dot_product = sum(
+                    (seed['vect'][dim]*song['vect'][dim] for dim in dim_small_set)
                     )
+            print '\t', song['title'], 'dot_prod is:', dot_product
+            song['sim'] = dot_product/(mag_seed*mag_song)
+            print '\tSim of', song['title'], ':', song['sim']
             # if the song is more similar and it is not already in the playlist
+            print '\tCount of song in playlist:', playlist.count(song)
             if ((song['sim'] > most_sim_song[1]) and (playlist.count(song)==0)):                
                 most_sim_song[0] = song
                 most_sim_song[1] = song['sim']
+        print 'Returning', most_sim_song[0]['title'], 'for seed', seed['title']
         return most_sim_song[0]        
         
     def generate_playlist(self, play_count, initial_song):
         # searchommend play_count number of songs
         playlist = []
-        result = searchommend(initial_song)
         playlist.append(initial_song)
+        result = self.searchommend(initial_song, playlist)
         playlist.append(result)
         for i in range(play_count-2):
-            result = searchommend(result)
+            result = self.searchommend(result, playlist)
             playlist.append(result)
         return playlist        
