@@ -9,7 +9,7 @@ def get_song_results(s_params, hundreds=10):
         s_params['api_key'] = 'ZSDNTL7YAQRK6028S'
     s_params['bucket'] = ['audio_summary', 'id:spotify-WW', 'tracks']
     s_params['limit'] = 'true'
-    s_params['results'] = '1'
+    s_params['results'] = '5'
 
     search_url = 'http://developer.echonest.com/api/v4/song/search'
 
