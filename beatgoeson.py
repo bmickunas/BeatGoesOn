@@ -35,9 +35,9 @@ class BeatGoesOn(object):
     def normed_vect(self, song):
         # Create the vector that has the dimensions with scores
         vect = {dim:song[dim] for dim in dim_full_set} # or full_set
-        # calculate the magnitude of the vector
-        # What about the values that are already normalized?
-        for dim in dim_full_set:                       #or full_set
+        # Make all scores between 0 and 1 by using the max and min values
+        #    for that specific field from the EchoNest API
+        for dim in dim_full_set:
             if dim in norm_ref:
                 normed_score = ((float(vect[dim]) - norm_ref[dim]['min'])
                                 / (norm_ref[dim]['max'] - norm_ref[dim]['min']))
@@ -47,8 +47,8 @@ class BeatGoesOn(object):
     def searchommend(self, seed, playlist):
         # calculate similarity value between song and all songs 
         #   in song_space
-        #print "Length of playlist: ", len(playlist)
         most_similar = []
+        # Calculate the Euclidian Distance between the seed and all songs
         for song in self.song_space:            
             eucl_dist = math.sqrt(sum(
                     ((seed['vect'][dim]-song['vect'][dim])**2 for dim in dim_small_set)
@@ -79,7 +79,7 @@ class BeatGoesOn(object):
 if __name__ == '__main__':
     beatbox = BeatGoesOn()
     print "Reading Data..."
-    #data = utils.read_songs()
+    #data = utils.read_songs() # this function is not working for some reason
     data_file = open("top_1000_clean_songs.json", 'r')
     data = json.load(data_file)
     beatbox.vectorize(data)
