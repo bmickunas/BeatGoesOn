@@ -106,5 +106,5 @@ if __name__ == '__main__':
                 i = i + 1 
             print "Retry? y/n"
             response = raw_input('--> ')
-            if response[0].lower == 'n':
+            if response[0] == 'n':
                 break
