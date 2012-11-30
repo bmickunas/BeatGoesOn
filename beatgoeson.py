@@ -51,7 +51,7 @@ class BeatGoesOn(object):
         # Calculate the Euclidian Distance between the seed and all songs
         for song in self.song_space:            
             eucl_dist = math.sqrt(sum(
-                    ((seed['vect'][dim]-song['vect'][dim])**2 for dim in dim_small_set)
+                    ((seed['vect'][dim]-song['vect'][dim])**2 for dim in dim_full_set)
                     ))              
             # if the song has a lesser euclidian distance 
             #   and it is not already in the playlist
