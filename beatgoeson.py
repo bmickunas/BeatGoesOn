@@ -80,7 +80,8 @@ if __name__ == '__main__':
     beatbox = BeatGoesOn()
     print "Reading Data..."
     #data = utils.read_songs() # this function is not working for some reason
-    data_file = open("top_1000_clean_songs.json", 'r')
+    #data_file = open("top_1000_clean_songs.json", 'r')
+    data_file = open("clean_full_data.json", 'r')
     data = json.load(data_file)
     beatbox.vectorize(data)
     print "Initializing Data..."
