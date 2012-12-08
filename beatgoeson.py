@@ -8,11 +8,11 @@ dim_full_set = ['danceability','energy','key','loudness',
 dim_small_set = ['danceability','energy','liveness']
 
 norm_ref = {
-    'key': {'max': 11.0, 'min': -1.0},
-    'loudness': {'max': 100.0, 'min': -100.0},
-    'tempo': {'max': 500.0, 'min': 0.0},
-    'mode': {'max': 1.0, 'min': -1.0},
-    'time_signature': {'max': 7.0, 'min': -1.0}
+    'key': {'max': 11.0, 'min': 0.0},
+    'loudness': {'max': 0.5, 'min': -52.0},
+    'tempo': {'max': 265.0, 'min': 0.0},
+    'mode': {'max': 1.0, 'min': 0.0},
+    'time_signature': {'max': 7.0, 'min': 0.0}
     }
   
 class BeatGoesOn(object):
