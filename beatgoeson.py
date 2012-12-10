@@ -2,10 +2,12 @@ import math
 import utils
 import ujson as json
 
-dim_full_set = ['danceability','energy','key','loudness',
-                    'tempo', 'speechiness', 'liveness', 'mode',
-                        'time_signature']
-dim_small_set = ['danceability','energy','liveness']
+dim_full_set = ['danceability','energy','speechiness', 'liveness', 
+                    'tempo', 'loudness',
+                'mode','key','time_signature'
+                ]
+
+dim_small_set = ['danceability','energy','tempo']
 
 norm_ref = {
     'key': {'max': 11.0, 'min': 0.0},
@@ -14,7 +16,20 @@ norm_ref = {
     'mode': {'max': 1.0, 'min': 0.0},
     'time_signature': {'max': 7.0, 'min': 0.0}
     }
-  
+
+key_remap = [
+    #array 0: minor mode
+    #0  1   2   3   4   5   6   7   8   9   10  11 (mapping index)
+    #C  Cs  D   Eb  E   F   Fs  G   Gs  A   Bb  B  (original order)
+    #a  e   b   fs  cs  gs  eb  bb  f   c   g   d  (new mapping order)
+    [9, 4,  11, 6,  1,  8,  3,  10, 5,  0,  7,  2],
+    #array 1: major mode
+    #0  1   2   3   4   5   6   7   8   9   10  11 (mapping index)
+    #C  Cs  D   Eb  E   F   Fs  G   Ab  A   Bb  B  (original order)
+    #C  G   D   A   E   B   Fs  Cs  Ab  Eb  Bb  F  (new mapping order)
+    [0, 7,  2,  9,  4,  11, 6,  1,  8,  3,  10, 5]
+    ]
+
 class BeatGoesOn(object):
     """ 
     A searchommender (search/reccommender) for continuous playlist 
@@ -27,6 +42,8 @@ class BeatGoesOn(object):
     def vectorize(self, songs):
         # songs is the list of nice data structures with the info we need
         for song in songs:
+            #remap the key ordering to circle of fifths
+            song['key'] = key_remap[song['mode']][song['key']]
             # get the normalized vector of for the song characteristics
             song['vect'] = self.normed_vect(song)
             # store song in song_space
@@ -48,6 +65,7 @@ class BeatGoesOn(object):
         # calculate similarity value between song and all songs 
         #   in song_space
         most_similar = []
+        print 'Searchommending', seed['title'], '...'
         # Calculate the Euclidian Distance between the seed and all songs
         for song in self.song_space:            
             eucl_dist = math.sqrt(sum(
@@ -59,10 +77,16 @@ class BeatGoesOn(object):
                 if (playlist.count(song)==0):
                     most_similar.append(song)
                     most_similar.append(eucl_dist)
+                    print '\tFirst result:', song['title'], ',', eucl_dist
+                    for dim in dim_full_set:
+                        print '\t\t', dim, song[dim]
             else:
                 if ((eucl_dist < most_similar[1]) and (playlist.count(song)==0)):
-                        most_similar[0] = song
-                        most_similar[1] = eucl_dist 
+                    most_similar[0] = song
+                    most_similar[1] = eucl_dist
+                    print '\tNew max:', song['title'], ',', eucl_dist
+                    for dim in dim_full_set:
+                        print '\t\t', dim, song[dim]
         return most_similar[0]        
         
     def generate_playlist(self, play_count, initial_song):
@@ -104,6 +128,8 @@ if __name__ == '__main__':
             print "Results:"
             for song in groovy_playlist:
                 print i,".) ", song['title'], " by ", song['artist_name']
+                for dim in dim_full_set:
+                    print '\t', dim, song[dim]
                 i = i + 1 
             print "Retry? y/n"
             response = raw_input('--> ')
