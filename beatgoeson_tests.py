@@ -91,7 +91,6 @@ mock_data = [
     }
 ]
 
-# mock_data located below class TestVectorize
 
 
 class TestVectorize(unittest.TestCase):
