@@ -67,7 +67,8 @@ class BeatGoesOn(object):
         most_similar = []
         print 'Searchommending', seed['title'], '...'
         # Calculate the Euclidian Distance between the seed and all songs
-        for song in self.song_space:            
+        print self.song_space[0]
+        for song in self.song_space:  
             eucl_dist = math.sqrt(sum(
                     ((seed['vect'][dim]-song['vect'][dim])**2 for dim in dim_full_set)
                     ))              
