@@ -30,6 +30,18 @@ key_remap = [
     [0, 7,  2,  9,  4,  11, 6,  1,  8,  3,  10, 5]
     ]
 
+weights = {
+    'danceability': 1.0,
+    'energy': 1.0,
+    'speechiness': 1.0,
+    'liveness': 1.0,
+    'tempo': 1.0,
+    'loudness': 1.0,
+    'mode': 1.0,
+    'key': 1.0,
+    'time_signature': 1.0
+    }
+
 class BeatGoesOn(object):
     """ 
     A searchommender (search/reccommender) for continuous playlist 
@@ -51,14 +63,17 @@ class BeatGoesOn(object):
             
     def normed_vect(self, song):
         # Create the vector that has the dimensions with scores
-        vect = {dim:song[dim] for dim in dim_full_set} # or full_set
+        #vect = {dim:song[dim] for dim in dim_full_set}
+        vect = {}
         # Make all scores between 0 and 1 by using the max and min values
         #    for that specific field from the EchoNest API
         for dim in dim_full_set:
+            vect[dim] = song[dim]
             if dim in norm_ref:
                 normed_score = ((float(vect[dim]) - norm_ref[dim]['min'])
                                 / (norm_ref[dim]['max'] - norm_ref[dim]['min']))
                 vect[dim] = normed_score
+            vect[dim] = vect[dim] * weights[dim]
         return vect       
     
     def searchommend(self, seed, playlist):
@@ -68,18 +83,29 @@ class BeatGoesOn(object):
         print 'Searchommending', seed['title'], '...'
         # Calculate the Euclidian Distance between the seed and all songs
         for song in self.song_space:            
-            eucl_dist = math.sqrt(sum(
-                    ((seed['vect'][dim]-song['vect'][dim])**2 for dim in dim_full_set)
-                    ))              
+            #eucl_dist = math.sqrt(sum(
+                    #((seed['vect'][dim]-song['vect'][dim])**2 for dim in dim_full_set)
+                    #))
+            total = 0
+            for dim in dim_full_set:
+                diff = seed['vect'][dim] - song['vect'][dim]
+                # for key, we use a circular distance measure
+                # (i.e. a key of 11 is next to 0)
+                # if the diff is more than 6, there is a shorter route on the
+                # other side of the circle
+                if dim == 'key' and abs(diff) > (6.0/11.0):
+                        diff = (12.0/11.0) - abs(diff)
+                total += diff**2
+            eucl_dist = math.sqrt(total)
             # if the song has a lesser euclidian distance 
             #   and it is not already in the playlist
             if (len(most_similar) == 0): 
                 if (playlist.count(song)==0):
                     most_similar.append(song)
                     most_similar.append(eucl_dist)
-                    print '\tFirst result:', song['title'], ',', eucl_dist
-                    for dim in dim_full_set:
-                        print '\t\t', dim, song[dim]
+                    #print '\tFirst result:', song['title'], ',', eucl_dist
+                    #for dim in dim_full_set:
+                        #print '\t\t', dim, song[dim]
             else:
                 if ((eucl_dist < most_similar[1]) and (playlist.count(song)==0)):
                     most_similar[0] = song
