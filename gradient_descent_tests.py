@@ -33,7 +33,7 @@ pair_error_of_half = ({'key': 2, 'title': 'halferror_0', 'energy': 0.4, 'livenes
  'time_signature': 4, 'duration': 225.2273, 'loudness': -6.7379999999999995,
  'danceability': 0.547264495122005})
  
-training_set = equal_pair,pair_error_of_half
+training_set = [equal_pair,pair_error_of_half]
 training_weights = {'time_signature': 1.25, 'energy': 1.2, 'liveness': 1.05,
  'tempo': 1.15, 'speechiness': 1.05, 'danceability': 1.25, 'key': 1.1,
  'loudness': 1.4, 'mode': 1.0}

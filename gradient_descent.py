@@ -62,8 +62,8 @@ class GradientDescent(object):
 if __name__ == '__main__':
     learner = GradientDescent()
     print "Reading Training Set..."
-    # data_file = open("",'r')
-    # training_set = json.load(data_file)
+    data_file = open("training_set.json",'r')
+    loaded_training_set = json.load(data_file)
     print "Learning..."
-    learner.learn(training_set)
+    learner.learn(loaded_training_set)
     print learner.model
