@@ -1,6 +1,7 @@
 import math
 import utils
-import ujson as json
+import ujson
+import json
 
 dim_full_set = ['danceability','energy','speechiness', 'liveness', 
                     'tempo', 'loudness',
@@ -80,9 +81,18 @@ class BeatGoesOn(object):
         # calculate similarity value between song and all songs 
         #   in song_space
         most_similar = []
-        print 'Searchommending', seed['title'], '...'
+        #print 'Searchommending', seed['title'], '...'
         # Calculate the Euclidian Distance between the seed and all songs
         for song in self.song_space:            
+            already_found = False
+            for item in playlist:
+                if ((item['title'].lower() in song['title'].lower()
+                     or song['title'].lower() in item['title'].lower())
+                        and item['artist_name'] == song['artist_name']):
+                    already_found = True
+            if already_found:
+                continue
+
             #eucl_dist = math.sqrt(sum(
                     #((seed['vect'][dim]-song['vect'][dim])**2 for dim in dim_full_set)
                     #))
@@ -100,7 +110,7 @@ class BeatGoesOn(object):
             # if the song has a lesser euclidian distance 
             #   and it is not already in the playlist
             if (len(most_similar) == 0): 
-                if (playlist.count(song)==0):
+                #if (playlist.count(song)==0):
                     most_similar.append(song)
                     most_similar.append(eucl_dist)
                     #print '\tFirst result:', song['title'], ',', eucl_dist
@@ -110,9 +120,9 @@ class BeatGoesOn(object):
                 if ((eucl_dist < most_similar[1]) and (playlist.count(song)==0)):
                     most_similar[0] = song
                     most_similar[1] = eucl_dist
-                    print '\tNew max:', song['title'], ',', eucl_dist
-                    for dim in dim_full_set:
-                        print '\t\t', dim, song[dim]
+                    #print '\tNew max:', song['title'], ',', eucl_dist
+                    #for dim in dim_full_set:
+                        #print '\t\t', dim, song[dim]
         return most_similar[0]        
         
     def generate_playlist(self, play_count, initial_song):
@@ -132,32 +142,60 @@ if __name__ == '__main__':
     #data = utils.read_songs() # this function is not working for some reason
     #data_file = open("top_1000_clean_songs.json", 'r')
     data_file = open("clean_full_data.json", 'r')
-    data = json.load(data_file)
+    data = ujson.load(data_file)
+    data_file.close()
     beatbox.vectorize(data)
     print "Initializing Data..."
     while(1):
-        print "Enter the title of your first song"
+        print "Enter the title of your first song:"
         title = raw_input('--> ')
         seed = {}
+        results = []
         for song in beatbox.song_space:
-            if song['title'].lower() == title.lower():
-                seed = song
-                break
-        if len(seed.keys()) == 0:
-            print "Error: Song not found"
-            continue    
+            #if song['title'].lower() == title.lower():
+            if title.lower() in song['title'].lower():
+                #seed = song
+                results.append(song)
+                #break
+        #if len(seed.keys()) == 0:
+        if len(results) == 0:
+            print "Error: Song not found in our database. Please try again."
+            continue
+        elif len(results) > 1:
+            print "Found multiple results:"
+            i = 1
+            for result in results:
+                print i,".) ", result['title'], " by ", result['artist_name']
+                i +=1
+            print "Enter number of the correct song:"
+            selection = raw_input('--> ')
+            # check for bad input?
+            if int(selection) < 0 or int(selection) > len(results):
+                print "Error: Number invalid. Please try again."
+                continue
+            seed = results[int(selection) - 1]
         else:
-            print "Enter how many songs you want on the playlist"
-            song_num = raw_input('--> ')
-            groovy_playlist = beatbox.generate_playlist(int(song_num),seed)  
-            i = 1;
-            print "Results:"
-            for song in groovy_playlist:
-                print i,".) ", song['title'], " by ", song['artist_name']
-                for dim in dim_full_set:
-                    print '\t', dim, song[dim]
-                i = i + 1 
-            print "Retry? y/n"
-            response = raw_input('--> ')
-            if response[0] == 'n':
-                break
+            seed = results[0]
+                
+        print "Enter how many songs you want on the playlist:"
+        song_num = raw_input('--> ')
+        groovy_playlist = beatbox.generate_playlist(int(song_num),seed)  
+        i = 1
+        print "Results:"
+        for song in groovy_playlist:
+            print i,".) ", song['title'], " by ", song['artist_name']
+            for dim in dim_full_set:
+                print '\t', dim, song[dim]
+            i = i + 1
+        print "Save this playlist to json? y/n"
+        response = raw_input('--> ')
+        if response[0] == 'y':
+            print "Please enter 'filename.json':"
+            filename = raw_input('--> ')
+            output_file = open(filename, 'w')
+            json.dump(groovy_playlist, output_file, indent=4)
+            output_file.close()
+        print "Retry? y/n"
+        response = raw_input('--> ')
+        if response[0] == 'n':
+            break
