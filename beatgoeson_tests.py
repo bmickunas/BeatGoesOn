@@ -124,6 +124,7 @@ class TestVectorize(unittest.TestCase):
 
     def test_normed_vect(self):
         vector = self.beatbox.normed_vect(mock_data[2])
+        # Test the normalization of the song vectors
         for dim in vector:
             print dim, ':', vector[dim]
             self.assertAlmostEqual(vector[dim], expected_norms[dim])
@@ -142,21 +143,16 @@ class TestVectorize(unittest.TestCase):
         self.assertEqual(result2, mock_data[1])
 
     def test_generate_playlist(self):
-        #print 'Testing playlist generation...'
         playlist = self.beatbox.generate_playlist(5, mock_data[2])
-        #print playlist
         # make sure the returned playlist has the requested length
         self.assertEqual(len(playlist), 5)
-        # this loop could be optimized... but it's short
+        # Make sure there are no duplicates
         for i in range(5):
             for j in range(5):
                 if i == j:
                     continue
                 else:
-                    # make sure there are no duplicates
-                   #print "i=", i, "\tj=", j
                     self.assertNotEqual(playlist[i], playlist[j])
-        
         # now check if the playlist has the correct order
         self.assertEqual(playlist[0], mock_data[2])
         self.assertEqual(playlist[1], mock_data[1])
@@ -167,6 +163,3 @@ class TestVectorize(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-
-
