@@ -1,4 +1,11 @@
-import ujson
+'''
+utils.py - Utility functions for BeatGoesOn.
+Authors: Sam Hatfield and Bradley Mickunas
+Date: December 12, 2012
+'''
+
+import ujson as json
+import json
 import fileinput
 
 song_ignore = ['search_rank','tracks','audio_md5']
@@ -8,28 +15,9 @@ audio_summary_ignore = ['audio_md5']
 
 def read_songs():
     for line in fileinput.input():
-        yield ujson.loads(line)
-
-def strip_dict(d,trash):
-    for field in trash:
-        if field in d:
-            del d[field]
+        yield json.loads(line)
             
 seen  = set()
-
-def prune_songs(songs):
-    pruned_songs = []
-    for song in songs:
-        #print song['id']
-        stripped_song = song
-        if stripped_song['id'] in seen:
-            continue
-        strip_dict(stripped_song, song_ignore)
-        strip_dict(stripped_song['analysis'], analysis_ignore)
-        strip_dict(stripped_song['audio_summary'], audio_summary_ignore)
-        seen.add(stripped_song['id'])
-        pruned_songs.append(stripped_song)
-    return pruned_songs
 
 def reorg_songs(songs):
     clean_songs = []
@@ -50,15 +38,5 @@ def reorg_songs(songs):
         clean_songs.append(clean_song)
 
     return clean_songs
-        
-        
-        
-        
-
-if __name__ == "__main__":
-    songs = read_songs()
-    pruned_songs = prune_songs(songs)
-    data_file = open("nice_data.json", 'w')
-    ujson.dump(pruned_songs, data_file, indent=4)
     
     

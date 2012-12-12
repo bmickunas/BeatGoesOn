@@ -1,3 +1,5 @@
+import ujson as json
+
 dim_full_set = ['danceability','energy','key','loudness',
                     'tempo', 'speechiness', 'liveness', 'mode',
                         'time_signature']

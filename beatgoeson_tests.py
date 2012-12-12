@@ -1,3 +1,9 @@
+'''
+beatgoeson_tests.py - Basic unittests for beatgoeson.py.
+Author: Sam Hatfield
+Date: December 12, 2012
+'''
+
 import unittest
 import beatgoeson
 
@@ -6,16 +12,30 @@ expected_keys_small = ['danceability','energy','liveness']
 expected_keys_large = ['danceability','energy','key','loudness',
                     'tempo', 'speechiness', 'liveness', 'mode',
                         'time_signature']
+
+weights = {
+    'danceability': 1.7025,
+    'energy': 1.7199,
+    'speechiness': 1.0598,
+    'liveness': 1.8126,
+    'tempo': 1.5437,
+    'loudness': 2.1480,
+    'mode': 1.6917,
+    'key': 1.4571,
+    'time_signature': 1.7686
+    }
+
 expected_norms = {
-    'energy': 0.5,
-    'tempo': 0.5,
-    'speechiness': 0.5,
-    'key': 0.5,
-    'liveness': 0.5,
-    'mode': 1,
-    'time_signature': 0.5,
-    'loudness': 0.5,
-    'danceability': 0.5
+    'energy': 0.5*weights['energy'],
+    'tempo': (250.0/265.0)*weights['tempo'],
+    'speechiness': 0.5*weights['speechiness'],
+    # NOTE: when we run normed_vect directly, keys aren't remapped
+    'key': (11.0/11.0)*weights['key'],
+    'liveness': 0.5*weights['liveness'],
+    'mode': 1.0*weights['mode'],
+    'time_signature': (3.0/7.0)*weights['time_signature'],
+    'loudness': ((0.0+52.0)/52.5)*weights['loudness'],
+    'danceability': 0.5*weights['danceability']
     }
     
 mock_data = [
@@ -25,10 +45,9 @@ mock_data = [
         'energy': 0.3,
         'tempo': 150.0,
         'speechiness': 0.3,
-        'key': 3.0,
-        'duration': 60.0,
+        'key': 9,   #3 in new mapping
         'liveness': 0.3,
-        'mode': 1.0,
+        'mode': 1,
         'time_signature': 3.0,
         'loudness': -40.0,
         'danceability': 0.3
@@ -39,8 +58,7 @@ mock_data = [
         'energy': 0.4,
         'tempo': 200,
         'speechiness': 0.4,
-        'key': 4,
-        'duration': 60,
+        'key': 4,   #4 in new mapping
         'liveness': 0.4,
         'mode': 1,
         'time_signature': 3,
@@ -53,8 +71,7 @@ mock_data = [
         'energy': 0.5,
         'tempo': 250.0,
         'speechiness': 0.5,
-        'key': 5.0,
-        'duration': 60.0,
+        'key': 11,  #5 in new mapping
         'liveness': 0.5,
         'mode': 1,
         'time_signature': 3,
@@ -67,8 +84,7 @@ mock_data = [
         'energy': 0.7,
         'tempo': 350,
         'speechiness': 0.7,
-        'key': 7,
-        'duration': 60,
+        'key': 1,   #7 in new mapping
         'liveness': 0.7,
         'mode': 1,
         'time_signature': 3,
@@ -81,8 +97,7 @@ mock_data = [
         'energy': 1.0,
         'tempo': 500,
         'speechiness': 1.0,
-        'key': 10,
-        'duration': 60,
+        'key': 10,  #10 in new mapping
         'liveness': 1.0,
         'mode': 1,
         'time_signature': 3,
@@ -110,7 +125,8 @@ class TestVectorize(unittest.TestCase):
     def test_normed_vect(self):
         vector = self.beatbox.normed_vect(mock_data[2])
         for dim in vector:
-            self.assertEqual(vector[dim], expected_norms[dim])
+            print dim, ':', vector[dim]
+            self.assertAlmostEqual(vector[dim], expected_norms[dim])
 
     def test_searchommend(self):
         playlist = []

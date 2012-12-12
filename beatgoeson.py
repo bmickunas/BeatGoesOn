@@ -1,3 +1,10 @@
+'''
+beatgoeson.py - Script and supporting classes, functions and data structures
+    for BeatGoesOn, our continuous song playlist generator.
+Authors: Sam Hatfield and Bradley Mickunas
+Date: December 12, 2012
+'''
+
 import math
 import utils
 import ujson
@@ -10,6 +17,7 @@ dim_full_set = ['danceability','energy','speechiness', 'liveness',
 
 dim_small_set = ['danceability','energy','tempo']
 
+# the max and min values for normalization into a 0.0-1.0 space
 norm_ref = {
     'key': {'max': 11.0, 'min': 0.0},
     'loudness': {'max': 0.5, 'min': -52.0},
@@ -18,6 +26,11 @@ norm_ref = {
     'time_signature': {'max': 7.0, 'min': 0.0}
     }
 
+'''
+This nested list structure allows us to remap the keys as reported by Echo Nest
+to the Circle of Fifths defined in music theory, giving more accurate key
+similarity.
+'''
 key_remap = [
     #array 0: minor mode
     #0  1   2   3   4   5   6   7   8   9   10  11 (mapping index)
@@ -31,28 +44,41 @@ key_remap = [
     [0, 7,  2,  9,  4,  11, 6,  1,  8,  3,  10, 5]
     ]
 
+'''
+These weights were determined by our machine learning algorithm, which is based
+on gradient descent. Relatively larger values increase the importance of a
+given feature, while smaller values decrease a feature's importance in
+similarity calculation.
+'''
 weights = {
-    'danceability': 1.0,
-    'energy': 1.0,
-    'speechiness': 1.0,
-    'liveness': 1.0,
-    'tempo': 1.0,
-    'loudness': 1.0,
-    'mode': 1.0,
-    'key': 1.0,
-    'time_signature': 1.0
+    'danceability': 1.7025,
+    'energy': 1.7199,
+    'speechiness': 1.0598,
+    'liveness': 1.8126,
+    'tempo': 1.5437,
+    'loudness': 2.1480,
+    'mode': 1.6917,
+    'key': 1.4571,
+    'time_signature': 1.7686
     }
 
 class BeatGoesOn(object):
     """ 
-    A searchommender (search/reccommender) for continuous playlist 
-    of songs 
+    A searchommender (search/reccommender) for a continuous & smooth playlist 
+    of songs.
     """
     
     def __init__(self):
         self.song_space = [] # vector space of all songs to choose from   
-        
+
+    
     def vectorize(self, songs):
+        '''
+        Reads in data and creates normalized 'vector' data structures
+        for each song.
+        Parameters:
+            songs - list of songs read in from a cleanly-formatted json file.
+        '''
         # songs is the list of nice data structures with the info we need
         for song in songs:
             #remap the key ordering to circle of fifths
@@ -63,6 +89,11 @@ class BeatGoesOn(object):
             self.song_space.append(song)
             
     def normed_vect(self, song):
+        '''
+        Creates vector of normalized data for a song.
+        Parameters:
+            song - a song data dict.
+        '''
         # Create the vector that has the dimensions with scores
         #vect = {dim:song[dim] for dim in dim_full_set}
         vect = {}
@@ -74,18 +105,27 @@ class BeatGoesOn(object):
                 normed_score = ((float(vect[dim]) - norm_ref[dim]['min'])
                                 / (norm_ref[dim]['max'] - norm_ref[dim]['min']))
                 vect[dim] = normed_score
-            vect[dim] = vect[dim] * weights[dim]
+            vect[dim] = float(vect[dim]) * weights[dim]
         return vect       
     
     def searchommend(self, seed, playlist):
-        # calculate similarity value between song and all songs 
-        #   in song_space
+        '''
+        Calculates similarity value between song and all songs in song_space,
+        then picks the most similar song for the next entry in playlist.
+        Parameters:
+            seed - Song we are comparing against (previous entry in playlist)
+            playlist - current list of songs, used to make sure we don't pick
+                the same song twice
+        '''
         most_similar = []
-        #print 'Searchommending', seed['title'], '...'
-        # Calculate the Euclidian Distance between the seed and all songs
-        for song in self.song_space:            
+
+        for song in self.song_space:
+            # first, we check if the same song is already in the playlist
             already_found = False
             for item in playlist:
+                # if the title of the song under review shows up in
+                #another title in the playlist and the artist is the same,
+                # throw out the song under review
                 if ((item['title'].lower() in song['title'].lower()
                      or song['title'].lower() in item['title'].lower())
                         and item['artist_name'] == song['artist_name']):
@@ -93,9 +133,7 @@ class BeatGoesOn(object):
             if already_found:
                 continue
 
-            #eucl_dist = math.sqrt(sum(
-                    #((seed['vect'][dim]-song['vect'][dim])**2 for dim in dim_full_set)
-                    #))
+            # Calculate the Euclidian Distance between the seed and all songs
             total = 0
             for dim in dim_full_set:
                 diff = seed['vect'][dim] - song['vect'][dim]
@@ -107,16 +145,16 @@ class BeatGoesOn(object):
                         diff = (12.0/11.0) - abs(diff)
                 total += diff**2
             eucl_dist = math.sqrt(total)
-            # if the song has a lesser euclidian distance 
-            #   and it is not already in the playlist
+            
+            # if a minimum hasn't been set yet, use this song
             if (len(most_similar) == 0): 
-                #if (playlist.count(song)==0):
-                    most_similar.append(song)
-                    most_similar.append(eucl_dist)
-                    #print '\tFirst result:', song['title'], ',', eucl_dist
-                    #for dim in dim_full_set:
-                        #print '\t\t', dim, song[dim]
+                most_similar.append(song)
+                most_similar.append(eucl_dist)
+                #print '\tFirst result:', song['title'], ',', eucl_dist
+                #for dim in dim_full_set:
+                    #print '\t\t', dim, song[dim]
             else:
+                # if the distance is less than the minimum, use this song
                 if ((eucl_dist < most_similar[1]) and (playlist.count(song)==0)):
                     most_similar[0] = song
                     most_similar[1] = eucl_dist
@@ -126,7 +164,13 @@ class BeatGoesOn(object):
         return most_similar[0]        
         
     def generate_playlist(self, play_count, initial_song):
-        # searchommend play_count number of songs
+        ''''
+        Generates a playlist by calling searchommend repeatedly for the desired
+        number of songs.
+        Parameters:
+            play_count - the number of songs for the playlist
+            initial_song - the song dict selected by the user
+        '''
         playlist = []
         playlist.append(initial_song)
         result = self.searchommend(initial_song, playlist)
@@ -137,10 +181,19 @@ class BeatGoesOn(object):
         return playlist        
         
 if __name__ == '__main__':
+    '''
+    When run from the command line, this script loads the data in
+    'clean_full_data.json' (a hardcoded filename) and runs the BeatGoesOn user
+    program.
+    Input:
+        clean_full_data.json - a list of cleanly-formatted song dicts
+        user input - decisions on input songs, number of songs, and output
+    Output:
+        text displayed on command line
+        'xxxxxx.json' - user-defined output file for playlists
+    '''
     beatbox = BeatGoesOn()
     print "Reading Data..."
-    #data = utils.read_songs() # this function is not working for some reason
-    #data_file = open("top_1000_clean_songs.json", 'r')
     data_file = open("clean_full_data.json", 'r')
     data = ujson.load(data_file)
     data_file.close()
@@ -152,12 +205,8 @@ if __name__ == '__main__':
         seed = {}
         results = []
         for song in beatbox.song_space:
-            #if song['title'].lower() == title.lower():
             if title.lower() in song['title'].lower():
-                #seed = song
                 results.append(song)
-                #break
-        #if len(seed.keys()) == 0:
         if len(results) == 0:
             print "Error: Song not found in our database. Please try again."
             continue
@@ -167,9 +216,8 @@ if __name__ == '__main__':
             for result in results:
                 print i,".) ", result['title'], " by ", result['artist_name']
                 i +=1
-            print "Enter number of the correct song:"
+            print "Enter number of the correct song (or -1 if not found):"
             selection = raw_input('--> ')
-            # check for bad input?
             if int(selection) < 0 or int(selection) > len(results):
                 print "Error: Number invalid. Please try again."
                 continue
