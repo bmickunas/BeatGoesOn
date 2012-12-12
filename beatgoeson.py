@@ -195,6 +195,9 @@ if __name__ == '__main__':
     beatbox = BeatGoesOn()
     print "Reading Data..."
     data_file = open("clean_full_data.json", 'r')
+    # uncomment the line below and comment the line above to run from the data
+    # stored on github
+    #data_file = open("top_1000_clean_songs.json", 'r')
     data = ujson.load(data_file)
     data_file.close()
     beatbox.vectorize(data)
@@ -232,8 +235,9 @@ if __name__ == '__main__':
         print "Results:"
         for song in groovy_playlist:
             print i,".) ", song['title'], " by ", song['artist_name']
-            for dim in dim_full_set:
-                print '\t', dim, song[dim]
+            # print song features
+            #for dim in dim_full_set:
+                #print '\t', dim, song[dim]
             i = i + 1
         print "Save this playlist to json? y/n"
         response = raw_input('--> ')
